@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BLOCK_SIZE 8 
+void ecb_encrypt(char* plaintext, char* key, int len)
+{
+    int i, j;
+    char block[BLOCK_SIZE];
+    char ciphertext[len];
+
+    int padding = BLOCK_SIZE - (len % BLOCK_SIZE);
+    if (padding > 0 && padding < BLOCK_SIZE) {
+        memset(plaintext + len, 0, padding);
+        len += padding;
+    }
+
+    for (i = 0; i < len; i += BLOCK_SIZE) {
+        memcpy(block, plaintext + i, BLOCK_SIZE);
+        for (j = 0; j < BLOCK_SIZE; j++) {
+            block[j] ^= key[j];
+        }
+        memcpy(ciphertext + i, block, BLOCK_SIZE);
+    }
+
+    printf("Ciphertext: %s\n", ciphertext);
+}
+
+int main()
+{
+    char plaintext[] = "This is a test message.";
+    char key[] = "secretke";
+
+    ecb_encrypt(plaintext, key, strlen(plaintext));
+
+    return 0;
+}
+OUTPUT:
+ORIGINAL PT: 80 00 00 00 00 00 00 00 10 32 54 76 98 BA DC FC
+ECB CT:12 17  12 1E 12 17 12 1E 03 06 03 0F 03 06 03 0F 93 34 57 79 9B BC DF F1
+CBC CT:92 34 5 6 78 90 AB CD EF 91 32 55 77 93 AD CE E0 02 06 02 OE O8 11 11 11
+CFB CT:03 06 03 0F 03 06 03 F0 00 00 00 00 00 00 00 00  93 34  57 79 BC DF F1
